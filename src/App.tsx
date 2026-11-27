@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
-import { auth, signInWithGoogle, signOutUser } from './firebase';
+import {
+  auth,
+  consumeGoogleRedirectResult,
+  getReadableFirebaseAuthError,
+  signInWithGoogle,
+  signOutUser,
+} from './firebase';
 import { isAuthorizedTeacher } from './config/teacher';
 import { getTopicById } from './data/topics';
 import {
@@ -132,8 +138,13 @@ function PickAndWriteApp() {
   const lastCheckedDraftRef = useRef<string | null>(null);
   const sessionLevelAppliedRef = useRef(false);
 
-  // Firebase Auth listener
+  // Firebase Auth listener + redirect result recovery (external mobile browsers)
   useEffect(() => {
+    void consumeGoogleRedirectResult().catch((err) => {
+      console.error('Redirect sign-in result error:', err);
+      setAuthError(getReadableFirebaseAuthError(err));
+    });
+
     const unsub = onAuthStateChanged(auth, async (fbUser) => {
       if (fbUser) {
         const email = fbUser.email ?? '';
@@ -195,9 +206,7 @@ function PickAndWriteApp() {
     try {
       await signInWithGoogle();
     } catch (err) {
-      setAuthError(
-        err instanceof Error ? err.message : 'Google Sign-In could not be completed.'
-      );
+      setAuthError(getReadableFirebaseAuthError(err));
     } finally {
       setAuthLoading(false);
     }
@@ -288,7 +297,8 @@ function PickAndWriteApp() {
         }),
       });
 
-      const data = (await response.json()) as {
+      const rawText = await response.text();
+      let data: {
         ok?: boolean;
         piiBlocked?: boolean;
         errorCategory?: string;
@@ -298,6 +308,13 @@ function PickAndWriteApp() {
         modelUsed?: string | null;
         feedback?: CoachFeedback;
       };
+      try {
+        data = JSON.parse(rawText);
+      } catch {
+        throw new Error(
+          `Non-JSON response from /api/coach/feedback (status=${response.status}, contentType=${response.headers.get('content-type') ?? 'unknown'})`
+        );
+      }
 
       if (data.piiBlocked) {
         setPiiWarning(data.error ?? null);
@@ -548,7 +565,8 @@ function PickAndWriteApp() {
         }),
       });
 
-      const data = (await response.json()) as {
+      const rawText = await response.text();
+      let data: {
         ok?: boolean;
         piiBlocked?: boolean;
         feedbackSource?: string;
@@ -559,6 +577,13 @@ function PickAndWriteApp() {
         errorKo?: string;
         result?: RevisionCheckResult | null;
       };
+      try {
+        data = JSON.parse(rawText);
+      } catch {
+        throw new Error(
+          `Non-JSON response from /api/coach/check-revision (status=${response.status}, contentType=${response.headers.get('content-type') ?? 'unknown'})`
+        );
+      }
 
       if (data.piiBlocked) {
         setPiiWarning(data.error ?? null);
@@ -733,7 +758,8 @@ function PickAndWriteApp() {
         }),
       });
 
-      const data = (await response.json()) as {
+      const rawText = await response.text();
+      let data: {
         ok?: boolean;
         piiBlocked?: boolean;
         noMoreIssues?: boolean;
@@ -746,6 +772,13 @@ function PickAndWriteApp() {
         errorKo?: string;
         feedback?: CoachFeedback;
       };
+      try {
+        data = JSON.parse(rawText);
+      } catch {
+        throw new Error(
+          `Non-JSON response from /api/coach/feedback (focusRound=2, status=${response.status}, contentType=${response.headers.get('content-type') ?? 'unknown'})`
+        );
+      }
 
       if (data.piiBlocked) {
         setPiiWarning(data.error ?? null);
