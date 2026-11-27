@@ -1,0 +1,182 @@
+{
+  "entities": {
+    "StudentProfile": {
+      "title": "StudentProfile",
+      "description": "Tracks a student's current scaffolding support level (1 to 3) across writing tasks.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Firebase Auth UID of the student."
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "description": "Display name shown on the student's profile."
+        },
+        "currentLevel": {
+          "type": "integer",
+          "description": "Current scaffolding level (1, 2, or 3)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the profile was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the profile was last updated."
+        }
+      },
+      "required": ["uid", "displayName", "currentLevel", "createdAt", "updatedAt"]
+    },
+    "WritingRecord": {
+      "title": "WritingRecord",
+      "description": "A completed Pick & Write! recommendation paragraph learning record.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Firebase Auth UID of the student who authored the record."
+        },
+        "studentName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "description": "Student display name shown in collection and read-only Teacher View."
+        },
+        "topic": {
+          "type": "string",
+          "enum": ["food", "place", "hobby"],
+          "description": "Selected recommendation topic identifier."
+        },
+        "topicTitle": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60,
+          "description": "Human-readable topic title."
+        },
+        "level": {
+          "type": "integer",
+          "description": "Support level used during this task (1, 2, or 3)."
+        },
+        "nextLevel": {
+          "type": "integer",
+          "description": "Recommended support level for the next task (1, 2, or 3)."
+        },
+        "hintsUsed": {
+          "type": "integer",
+          "description": "Total number of hints used (0 to 3)."
+        },
+        "planQ1": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 300,
+          "description": "Planning answer 1."
+        },
+        "planQ2": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 300,
+          "description": "Planning answer 2."
+        },
+        "planQ3": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 300,
+          "description": "Planning answer 3."
+        },
+        "planQ4": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 300,
+          "description": "Planning answer 4."
+        },
+        "firstDraft": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000,
+          "description": "Student's first draft before revision."
+        },
+        "finalParagraph": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000,
+          "description": "Student's final revised recommendation paragraph."
+        },
+        "reflection": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 500,
+          "description": "Student's reflection on their writing improvement."
+        },
+        "aiPraise": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 400,
+          "description": "Coco's praise message."
+        },
+        "aiFixPoint": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 400,
+          "description": "Coco's focused improvement point."
+        },
+        "aiQuestion": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 400,
+          "description": "Coco's guiding question."
+        },
+        "fixedOnFirstTry": {
+          "type": "boolean",
+          "description": "Whether the student addressed the feedback on their first revision attempt."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the writing record was saved."
+        }
+      },
+      "required": [
+        "uid",
+        "studentName",
+        "topic",
+        "topicTitle",
+        "level",
+        "nextLevel",
+        "hintsUsed",
+        "planQ1",
+        "planQ2",
+        "planQ3",
+        "planQ4",
+        "firstDraft",
+        "finalParagraph",
+        "reflection",
+        "aiPraise",
+        "aiFixPoint",
+        "aiQuestion",
+        "fixedOnFirstTry",
+        "createdAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/StudentProfile" },
+      "description": "Student profile storing current scaffolding level (1-3)."
+    },
+    "/writingRecords/{recordId}": {
+      "schema": { "$ref": "#/entities/WritingRecord" },
+      "description": "Saved student recommendation paragraphs, readable by owner or verified teacher email."
+    }
+  }
+}

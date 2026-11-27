@@ -1,0 +1,6 @@
+{
+  "name": "Pick & Write!",
+  "description": "A guided English recommendation writing coach for middle school learners with focused AI hints, progressive scaffolding, and personalized recommendation cards.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
