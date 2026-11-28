@@ -163,11 +163,11 @@ export function CocoCard({
           <div className="p-3.5 rounded-xl bg-teal-50/70 border border-teal-200">
             <div className="text-xs font-bold text-teal-900">No Major Fixes Needed</div>
             <p className="mt-1 text-sm text-slate-800 leading-relaxed">
-              Your paragraph already has clear ideas, a reason, and natural A2 English. You can polish anything freely in Rewrite or submit your card!
+              Your ideas and reason are clear. Your English is easy to understand! You can edit your writing or submit your card.
             </p>
             {showKorean && (
               <p className="mt-1.5 text-xs text-teal-900 leading-relaxed">
-                이미 생각과 추천 이유, 문장이 잘 갖춰져 있어요! 수정 단계에서 자유롭게 다듬거나 바로 카드를 제출할 수 있어요.
+                생각과 추천 이유가 분명해요. 영어 문장도 읽기 쉽고 잘 이해돼요! 글을 더 수정하거나 바로 카드를 제출할 수 있어요.
               </p>
             )}
           </div>
