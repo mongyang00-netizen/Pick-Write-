@@ -171,6 +171,20 @@ export function CocoCard({
               </p>
             )}
           </div>
+
+          {feedback.writingTip && (
+            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+              <div className="text-xs font-bold text-slate-700">Writing Tip (Optional)</div>
+              <p className="mt-1 text-sm text-slate-800 leading-relaxed">
+                {feedback.writingTip}
+              </p>
+              {showKorean && feedback.writingTipKo && (
+                <p className="mt-1.5 text-xs text-slate-600 leading-relaxed">
+                  {feedback.writingTipKo}
+                </p>
+              )}
+            </div>
+          )}
         </div>
       ) : (
         /* Order: Praise -> Fix -> Active Hint Stage (Hint 1 / Hint 2 / Hint 3) */

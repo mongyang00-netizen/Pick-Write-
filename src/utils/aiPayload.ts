@@ -113,6 +113,11 @@ function checkOptionalString(
   return val.trim();
 }
 
+function readTrulyOptionalString(obj: Record<string, unknown>, field: string): string {
+  const val = obj[field];
+  return typeof val === 'string' ? val.trim() : '';
+}
+
 export function parseAndValidateCoachFeedback(params: {
   rawText: string;
   finishReason?: string;
@@ -135,6 +140,8 @@ export function parseAndValidateCoachFeedback(params: {
   const hint2Ko = checkOptionalString(obj, 'hint2Ko', invalidFields);
   const hint3 = checkOptionalString(obj, 'hint3', invalidFields);
   const hint3Ko = checkOptionalString(obj, 'hint3Ko', invalidFields);
+  const writingTip = readTrulyOptionalString(obj, 'writingTip');
+  const writingTipKo = readTrulyOptionalString(obj, 'writingTipKo');
 
   if (invalidFields.length > 0) {
     throw new GeminiPayloadError(
@@ -185,6 +192,8 @@ export function parseAndValidateCoachFeedback(params: {
       hint2Ko: '',
       hint3: '',
       hint3Ko: '',
+      writingTip,
+      writingTipKo: writingTip ? writingTipKo : '',
     };
   }
 
@@ -201,6 +210,8 @@ export function parseAndValidateCoachFeedback(params: {
     hint2Ko,
     hint3,
     hint3Ko,
+    writingTip: '',
+    writingTipKo: '',
   };
 }
 

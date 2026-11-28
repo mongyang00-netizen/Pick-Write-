@@ -36,6 +36,8 @@ export interface CoachFeedback {
   hint3Ko: string;
   isFallback?: boolean;
   noMoreIssues?: boolean;
+  writingTip?: string;
+  writingTipKo?: string;
   selfCheckQuestions?: SelfCheckItem[];
 }
 

@@ -53,6 +53,58 @@ test('parseAndValidateCoachFeedback accepts valid noMoreIssues=true with empty f
   assert.equal(result.praise, 'Your recommendation paragraph is clear and complete!');
   assert.equal(result.fixPoint, '');
   assert.equal(result.question, '');
+  assert.equal(result.writingTip, '');
+});
+
+test('parseAndValidateCoachFeedback handles optional writingTip cleanly across true/false/null states', () => {
+  const withTip = parseAndValidateCoachFeedback({
+    finishReason: 'STOP',
+    rawText: JSON.stringify({
+      noMoreIssues: true,
+      praise: 'Great job!',
+      praiseKo: '잘했어요!',
+      fixPoint: '',
+      fixPointKo: '',
+      question: '',
+      questionKo: '',
+      highlightText: '',
+      hint2: '',
+      hint2Ko: '',
+      hint3: '',
+      hint3Ko: '',
+      writingTip: 'Tip: Phrases like "It makes me feel..." are fun to use.',
+      writingTipKo: '팁: "It makes me feel..." 같은 표현도 활용해 볼 수 있어요.',
+    }),
+  });
+  assert.equal(withTip.noMoreIssues, true);
+  assert.equal(withTip.writingTip, 'Tip: Phrases like "It makes me feel..." are fun to use.');
+
+  const withNullTip = parseAndValidateCoachFeedback({
+    finishReason: 'STOP',
+    rawText: JSON.stringify({
+      noMoreIssues: true,
+      praise: 'Great job!',
+      praiseKo: '잘했어요!',
+      writingTip: null,
+      writingTipKo: null,
+    }),
+  });
+  assert.equal(withNullTip.noMoreIssues, true);
+  assert.equal(withNullTip.writingTip, '');
+
+  const issueWithStrayTip = parseAndValidateCoachFeedback({
+    finishReason: 'STOP',
+    rawText: JSON.stringify({
+      noMoreIssues: false,
+      praise: 'Nice start!',
+      fixPoint: 'Focus on the place topic.',
+      question: 'Why should a friend visit this place?',
+      hint2: 'Describe the place itself.',
+      hint3: 'You should visit the park because it has green trees.',
+      writingTip: 'Should be cleared',
+    }),
+  });
+  assert.equal(issueWithStrayTip.writingTip, '');
 });
 
 test('parseAndValidateCoachFeedback distinguishes finishReason MAX_TOKENS truncation', () => {

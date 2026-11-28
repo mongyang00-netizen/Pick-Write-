@@ -34,6 +34,7 @@ interface RewriteStepProps {
   isChecking: boolean;
   isLoadingSecondFocus: boolean;
   noMoreIssuesFound: boolean;
+  secondFocusTip?: { tip: string; tipKo?: string } | null;
   secondFocusError: RevisionCheckError | null;
   revisionCheck: RevisionCheckResult | null;
   revisionCheckError: RevisionCheckError | null;
@@ -63,6 +64,7 @@ export function RewriteStep({
   isChecking,
   isLoadingSecondFocus,
   noMoreIssuesFound,
+  secondFocusTip,
   secondFocusError,
   revisionCheck,
   revisionCheckError,
@@ -80,6 +82,9 @@ export function RewriteStep({
   const isFallback = Boolean(feedback.isFallback);
   const isAllClear = !isFallback && Boolean(feedback.noMoreIssues);
   const busy = isChecking || isLoadingSecondFocus;
+  const showCheckAction = !isFallback && !isAllClear && !hint3FailedForFocus;
+  const revisionApproved = Boolean(revisionCheck?.addressedFeedback);
+  const checkIsPrimary = showCheckAction && !revisionApproved;
 
   return (
     <div className="max-w-5xl mx-auto w-full px-4 sm:px-6 py-6 sm:py-8">
@@ -258,8 +263,19 @@ export function RewriteStep({
               )}
 
               {revisionCheck.addressedFeedback && noMoreIssuesFound && (
-                <div className="mt-3 p-3 rounded-lg bg-white/80 border border-emerald-200 text-xs text-emerald-950 font-medium">
-                  Coco checked your whole paragraph — no more major fixes are needed! You can submit your card now.
+                <div className="mt-3 p-3 rounded-lg bg-white/80 border border-emerald-200 text-xs text-emerald-950 font-medium space-y-1.5">
+                  <p>
+                    Coco checked your whole paragraph — no more major fixes are needed! You can submit your card now.
+                  </p>
+                  {secondFocusTip?.tip && (
+                    <div className="pt-1.5 border-t border-emerald-200/70 text-slate-700 font-normal">
+                      <span className="font-bold text-slate-800">Writing Tip (Optional): </span>
+                      <span>{secondFocusTip.tip}</span>
+                      {showKorean && secondFocusTip.tipKo && (
+                        <p className="mt-1 text-slate-600">{secondFocusTip.tipKo}</p>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -306,26 +322,40 @@ export function RewriteStep({
             </div>
           )}
 
-          {!isFallback && !isAllClear && !hint3FailedForFocus && (
-            <div className="mt-4 flex flex-wrap items-center gap-3">
+          {showCheckAction && (
+            <div className="mt-5">
               <button
                 type="button"
                 onClick={onCheckRevision}
                 disabled={busy}
-                className="min-h-[44px] px-4 py-2 rounded-xl border border-teal-700 text-teal-800 bg-teal-50 hover:bg-teal-100 text-sm font-semibold disabled:opacity-60 transition-colors"
+                className={
+                  checkIsPrimary
+                    ? 'w-full min-h-[54px] px-6 py-3.5 rounded-xl bg-teal-700 text-white hover:bg-teal-800 shadow-sm text-base font-bold disabled:opacity-60 transition-colors inline-flex items-center justify-center gap-2.5'
+                    : 'w-full sm:w-auto min-h-[44px] px-4 py-2 rounded-xl border border-teal-700 text-teal-800 bg-teal-50 hover:bg-teal-100 text-sm font-semibold disabled:opacity-60 transition-colors inline-flex items-center justify-center gap-2'
+                }
               >
-                {isChecking ? 'Checking your revision...' : 'Check My Revision'}
+                {isChecking ? (
+                  <RefreshCw className="w-4 h-4 animate-spin shrink-0" aria-hidden="true" />
+                ) : (
+                  <CheckCircle2 className="w-5 h-5 shrink-0" aria-hidden="true" />
+                )}
+                <span>{isChecking ? 'Checking your revision...' : 'Check My Revision'}</span>
               </button>
+              {checkIsPrimary && (
+                <p className="mt-2 text-xs text-slate-500 text-center">
+                  Ask Coco to check your fix first — or submit anytime below.
+                </p>
+              )}
             </div>
           )}
 
           {/* Bottom Navigation (Submit anytime!) */}
-          <div className="mt-6 pt-4 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
+          <div className="mt-5 pt-4 border-t border-slate-200 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-2.5 sm:gap-3">
             <button
               type="button"
               onClick={onBack}
               disabled={busy}
-              className="min-h-[48px] px-5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60 transition-colors inline-flex items-center gap-2"
+              className="w-full sm:w-auto justify-center min-h-[44px] px-4 py-2 rounded-xl border border-slate-300 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60 transition-colors inline-flex items-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" aria-hidden="true" />
               <span>Back to Hint</span>
@@ -335,7 +365,11 @@ export function RewriteStep({
               type="button"
               onClick={onNext}
               disabled={busy}
-              className="min-h-[48px] px-5 py-2.5 rounded-xl bg-teal-700 text-white text-sm font-semibold hover:bg-teal-800 disabled:opacity-60 transition-colors inline-flex items-center gap-2"
+              className={
+                checkIsPrimary
+                  ? 'w-full sm:w-auto justify-center min-h-[44px] px-4 py-2 rounded-xl border border-slate-300 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60 transition-colors inline-flex items-center gap-2'
+                  : 'w-full sm:w-auto justify-center min-h-[50px] px-5 py-2.5 rounded-xl bg-teal-700 text-white text-sm font-bold hover:bg-teal-800 shadow-sm disabled:opacity-60 transition-colors inline-flex items-center gap-2'
+              }
             >
               <span>Submit Card &amp; See Result</span>
               <ArrowRight className="w-4 h-4" aria-hidden="true" />

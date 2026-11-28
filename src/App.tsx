@@ -115,6 +115,7 @@ function PickAndWriteApp() {
   const [revisionCheck, setRevisionCheck] = useState<RevisionCheckResult | null>(null);
   const [revisionCheckError, setRevisionCheckError] = useState<RevisionCheckError | null>(null);
   const [noMoreIssuesFound, setNoMoreIssuesFound] = useState(false);
+  const [secondFocusTip, setSecondFocusTip] = useState<{ tip: string; tipKo?: string } | null>(null);
   const [hint3FailedForFocus, setHint3FailedForFocus] = useState(false);
   const [secondFocusError, setSecondFocusError] = useState<RevisionCheckError | null>(null);
   const [nextLevel, setNextLevel] = useState<SupportLevel>(currentLevel);
@@ -242,6 +243,7 @@ function PickAndWriteApp() {
     setRevisionCheck(null);
     setRevisionCheckError(null);
     setNoMoreIssuesFound(false);
+    setSecondFocusTip(null);
     setHint3FailedForFocus(false);
     setSecondFocusError(null);
     lastFeedbackKeyRef.current = null;
@@ -444,6 +446,7 @@ function PickAndWriteApp() {
       setRevisionCheck(null);
       setRevisionCheckError(null);
       setNoMoreIssuesFound(isInitialAllClear);
+      setSecondFocusTip(null);
       setHint3FailedForFocus(false);
       setSecondFocusError(null);
       setHintUnlockNotice(null);
@@ -508,6 +511,7 @@ function PickAndWriteApp() {
         setRevisionCheck(null);
         setRevisionCheckError(null);
         setNoMoreIssuesFound(isInitialAllClear);
+        setSecondFocusTip(null);
         setHint3FailedForFocus(false);
         setHintUnlockNotice(null);
         lastCheckedDraftRef.current = null;
@@ -816,6 +820,14 @@ function PickAndWriteApp() {
 
       if (data.noMoreIssues || data.feedback.noMoreIssues) {
         setNoMoreIssuesFound(true);
+        setSecondFocusTip(
+          data.feedback.writingTip
+            ? {
+                tip: data.feedback.writingTip,
+                tipKo: data.feedback.writingTipKo,
+              }
+            : null
+        );
         return;
       }
 
@@ -1128,6 +1140,7 @@ function PickAndWriteApp() {
             isChecking={isCheckingRevision}
             isLoadingSecondFocus={isLoadingSecondFocus}
             noMoreIssuesFound={noMoreIssuesFound}
+            secondFocusTip={secondFocusTip}
             secondFocusError={secondFocusError}
             revisionCheck={revisionCheck}
             revisionCheckError={revisionCheckError}
